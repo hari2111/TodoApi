@@ -24,27 +24,21 @@ app.get('/todos',function(req,res){
 });
 app.get('/todos/:id', function(req,res){
 	var todoId=parseInt(req.params.id,10);//converts string to number
-	var matchedtodo=_.findWhere(todos,{id:todoId});
-
-	if(matchedtodo){
-		res.json(matchedtodo);
-	}else {
-		res.status(404).send();
-	}
+	db.todo.findById(todoId).then(function(todo){
+		if(!!todo){
+		res.json(todo);//res.json(todo.toJSON) for wat reason
+					}else{res.status(404).send()}
+	},function(e){
+		res.status(500).json(e);
+	});
 });
 //POST
 app.post('/todos',function(req,res){
 	var body=_.pick(req.body,'description','completed');
 	 //  if(!_.isBoolean(body.completed) || _.isString(body.description) || body.description===0) {
-	 //  	return res.status(400).send();
-	 //  }
-		// body.description=body.description.trim();
-	 // 	console.log("description :"+ body.description);
-		// body.id=todoNextid++;
-		// todos.push(body);
-		// res.json(body);
+	
 	db.todo.create(body).then(function(todo){
-		res.json(todo.toJSON());
+		res.json(todo);
 	},function(e){
 		res.status(400).json(e);
 	});
