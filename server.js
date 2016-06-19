@@ -46,8 +46,6 @@ app.get('/todos/:id', function(req,res){
 //POST
 app.post('/todos',function(req,res){
 	var body=_.pick(req.body,'description','completed');
-	 //  if(!_.isBoolean(body.completed) || _.isString(body.description) || body.description===0) {
-	
 	db.todo.create(body).then(function(todo){
 		res.json(todo);
 	},function(e){
