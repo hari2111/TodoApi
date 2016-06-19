@@ -5,7 +5,6 @@ var PORT=process.env.PORT || 3000;
 var todoNextid=1;
 var _ =require('underscore');
 var db=require('./db.js');
-var todos={};
 app.use(bodyParser.json());
 
 app.get('/',function (req,res) {
