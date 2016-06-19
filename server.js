@@ -5,22 +5,33 @@ var PORT=process.env.PORT || 3000;
 var todoNextid=1;
 var _ =require('underscore');
 var db=require('./db.js');
-
+var todos={};
 app.use(bodyParser.json());
 
-var todos = [];
 app.get('/',function (req,res) {
 	res.send('TODO API');
 });
 app.get('/todos',function(req,res){
-	var queryParams=req.body;
-	var filteredTodos=todos;
-	if(queryParams.hasOwnProperty('completed') && queryParams.completed ==='true'){
-		filteredTodos=_.where(filteredTodos,{completed:true});
-	}else if(queryParams.hasOwnProperty('completed') && queryParams.completed==='false'){
-		filteredTodos=_.where(filteredTodos,{completed:false});
+	var query=req.query;
+	var where={};
+
+	if(query.hasOwnProperty('completed') && query.completed==='true'){
+		where.completed=true;
+	}else if(query.hasOwnProperty('completed')&&query.completed==='false'){
+		where.completed=false;
 	}
-	res.json(filteredTodos);
+	if(query.hasOwnProperty('q') && query.q.length>0){
+		where.description={
+			$like:'%'+query.q+'%'
+		};
+	}
+	db.todo.findAll({where:where}).then(function(todos){
+		res.json(todos);
+	},function(e){
+		res.status(404).send();
+	});
+
+
 });
 app.get('/todos/:id', function(req,res){
 	var todoId=parseInt(req.params.id,10);//converts string to number
